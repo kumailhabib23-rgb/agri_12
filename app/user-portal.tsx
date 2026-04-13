@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
 
   gridText: {
     fontSize: 12,
-    marginTop: 6,
+    marginTop: 6, 
     fontWeight: "500",
   },
 
