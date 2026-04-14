@@ -7,32 +7,37 @@ import {
   ScrollView,
   Animated,
   StatusBar,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import Footer from "./components/footer";
 
 export default function Portal() {
+
+  const router = useRouter();
 
   const user = {
     name: "Ali Khan",
     location: "Sindh, Pakistan",
   };
 
+  // 🟩 CATEGORY
   const categories = [
-    "Vegetables",
-    "Fruits",
-    "Meat",
-    "Grains",
-    "Dairy",
-    "Poultry",
+    { name: "Vegetables", icon: "leaf" },
+    { name: "Fruits", icon: "nutrition" },
+    { name: "Meat", icon: "restaurant" },
+    { name: "Grains", icon: "leaf-outline" },
+    { name: "Dairy", icon: "water" },
+    { name: "Poultry", icon: "egg" },
   ];
 
   const [search, setSearch] = useState("");
-
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // ⏳ COUNTDOWN
+  // ⏳ TIMER
   useEffect(() => {
     const target = Date.now() + 24 * 60 * 60 * 1000;
 
@@ -44,19 +49,19 @@ export default function Portal() {
     return () => clearInterval(interval);
   }, []);
 
-  const formatTime = (ms: number) => {
+  const formatTime = (ms) => {
     const total = Math.floor(ms / 1000);
     const h = Math.floor(total / 3600);
     const m = Math.floor((total % 3600) / 60);
     const s = total % 60;
-    return `${h}h ${m}m ${s}s`;
+    return h + "h " + m + "m " + s + "s";
   };
 
   const filtered = categories.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase())
+    item.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  /* ================= HEADER ANIMATION ================= */
+  // 🎬 HEADER ANIMATION
   const headerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -72,33 +77,35 @@ export default function Portal() {
     outputRange: [-120, 0],
   });
 
-  const headerOpacity = headerAnim;
-
   return (
     <View style={styles.root}>
 
       <StatusBar barStyle="light-content" backgroundColor="#1b5e20" />
 
-      {/* 🌿 ANIMATED HEADER */}
+      {/* 🌿 HEADER */}
       <Animated.View
         style={[
           styles.header,
           {
             transform: [{ translateY: headerTranslate }],
-            opacity: headerOpacity,
+            opacity: headerAnim,
           },
         ]}
       >
         <View style={styles.headerRow}>
 
-          <View style={styles.iconBox}>
-            <Ionicons name="leaf" size={26} color="#1b5e20" />
-          </View>
-
           <View>
-            <Text style={styles.name}>Hello, {user.name} </Text>
+            <Text style={styles.name}>Hello, {user.name} 👋</Text>
             <Text style={styles.location}>📍 {user.location}</Text>
           </View>
+
+          {/* 👤 PROFILE ICON */}
+          <TouchableOpacity
+            style={styles.iconBox}
+            onPress={() => router.push("./profile")}
+          >
+            <Ionicons name="person" size={24} color="#1b5e20" />
+          </TouchableOpacity>
 
         </View>
 
@@ -114,7 +121,7 @@ export default function Portal() {
         <View style={styles.searchBox}>
           <Ionicons name="search" size={20} color="#666" />
           <TextInput
-            placeholder="Search vegetables, fruits..."
+            placeholder="Search categories..."
             value={search}
             onChangeText={setSearch}
             style={styles.input}
@@ -153,8 +160,8 @@ export default function Portal() {
         <View style={styles.grid}>
           {filtered.map((item, i) => (
             <View key={i} style={styles.gridCard}>
-              <Ionicons name="leaf" size={24} color="#2e7d32" />
-              <Text style={styles.gridText}>{item}</Text>
+              <Ionicons name={item.icon} size={26} color="#2e7d32" />
+              <Text style={styles.gridText}>{item.name}</Text>
             </View>
           ))}
         </View>
@@ -167,8 +174,9 @@ export default function Portal() {
   );
 }
 
-/* ================= SLIDER ================= */
+/* 🌾 SLIDER COMPONENT */
 const AgriSlider = () => {
+
   const images = [
     require("../assets/images/1.jpg"),
     require("../assets/images/2.jpg"),
@@ -178,7 +186,7 @@ const AgriSlider = () => {
   const titles = [
     "Green Agriculture 🌿",
     "Smart Farming 🚜",
-    "Sustainable Growth 🌱",
+    "Modern Techniques 🌱",
   ];
 
   const [index, setIndex] = useState(0);
@@ -186,11 +194,13 @@ const AgriSlider = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
+
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 400,
         useNativeDriver: true,
       }).start(() => {
+
         setIndex((prev) => (prev + 1) % images.length);
 
         Animated.timing(fadeAnim, {
@@ -198,8 +208,10 @@ const AgriSlider = () => {
           duration: 400,
           useNativeDriver: true,
         }).start();
+
       });
-    }, 2800);
+
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -210,41 +222,33 @@ const AgriSlider = () => {
       <Animated.Image
         source={images[index]}
         style={[styles.sliderImage, { opacity: fadeAnim }]}
-        resizeMode="cover"
       />
 
       <View style={styles.sliderOverlay}>
         <Text style={styles.sliderTitle}>{titles[index]}</Text>
-
-        <Text style={styles.sliderText}>
-          Swat Sindh Agriculture Organization promoting modern farming techniques and rural development.
-        </Text>
       </View>
 
     </View>
   );
 };
 
-/* ================= STYLES ================= */
+/* 🎨 STYLES */
 const styles = StyleSheet.create({
 
-  root: {
-    flex: 1,
-    backgroundColor: "#f4fbf4",
-  },
+  root: { flex: 1, backgroundColor: "#f4fbf4" },
 
   header: {
     backgroundColor: "#1b5e20",
-    paddingTop: 45,
+    paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 18,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
-    elevation: 10,
   },
 
   headerRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
 
@@ -252,25 +256,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 10,
     borderRadius: 50,
-    marginRight: 10,
   },
 
-  name: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  name: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  location: { color: "#c8e6c9", fontSize: 12 },
 
-  location: {
-    color: "#c8e6c9",
-    fontSize: 12,
-  },
-
-  headerSub: {
-    marginTop: 8,
-    color: "#e8f5e9",
-    fontSize: 12,
-  },
+  headerSub: { marginTop: 8, color: "#e8f5e9", fontSize: 12 },
 
   searchBox: {
     flexDirection: "row",
@@ -279,25 +270,20 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 14,
     alignItems: "center",
-    elevation: 3,
   },
 
-  input: {
-    marginLeft: 10,
-    flex: 1,
-  },
+  input: { marginLeft: 10, flex: 1 },
 
   slider: {
     marginHorizontal: 15,
+    height: 200,
     borderRadius: 18,
     overflow: "hidden",
-    height: 210,
-    elevation: 5,
   },
 
   sliderImage: {
     width: "100%",
-    height: 210,
+    height: 200,
     position: "absolute",
   },
 
@@ -305,19 +291,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     padding: 15,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
 
   sliderTitle: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-  },
-
-  sliderText: {
-    color: "#fff",
-    fontSize: 12,
-    marginTop: 5,
   },
 
   cardRow: {
@@ -332,24 +312,14 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 14,
     alignItems: "center",
-    elevation: 4,
   },
 
-  cardNum: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#1b5e20",
-  },
-
-  cardText: {
-    fontSize: 10,
-    color: "#666",
-  },
+  cardNum: { fontWeight: "bold", color: "#1b5e20" },
+  cardText: { fontSize: 10, color: "#666" },
 
   section: {
     marginLeft: 15,
     marginTop: 18,
-    fontSize: 16,
     fontWeight: "bold",
     color: "#1b5e20",
   },
@@ -368,13 +338,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 14,
     alignItems: "center",
-    elevation: 3,
   },
 
-  gridText: {
-    fontSize: 12,
-    marginTop: 6, 
-    fontWeight: "500",
-  },
+  gridText: { marginTop: 6 },
 
 });

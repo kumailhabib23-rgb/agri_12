@@ -1,88 +1,82 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  TouchableOpacity,
+} from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
-import { getUser, initDB } from "./utils/db";
 
 export default function Profile() {
-  const { username } = useLocalSearchParams();
-  const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    initDB();
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const res = await getUser(username);
-
-    if (res && res.length > 0) {
-      setUser(res[0]);
-    }
+  // 👤 DUMMY USER DATA
+  const user = {
+    name: "Ali Khan",
+    location: "Sindh, Pakistan",
+    email: "alikhan@gmail.com",
+    phone: "+92 300 1234567",
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.root}>
 
-      {/* 🔥 HEADER */}
+      <StatusBar barStyle="light-content" backgroundColor="#1b5e20" />
+
+      {/* 🌿 HEADER */}
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-      </View>
 
-      {/* 🧑 AVATAR + NAME */}
-      <View style={styles.avatarBox}>
+        <View style={styles.profileCircle}>
+          <Ionicons name="person" size={40} color="#1b5e20" />
+        </View>
 
-        <Image
-          source={{
-            uri:
-              user?.avatar ||
-              "https://i.pravatar.cc/150?img=12",
-          }}
-          style={styles.avatar}
-        />
-
-        {/* 🔥 DYNAMIC NAME */}
-        <Text style={styles.name}>
-          {user?.name || "Loading..."}
-        </Text>
-
-        {/* 🔥 USERNAME */}
-        <Text style={styles.username}>
-          @{user?.username || username}
-        </Text>
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.location}>📍 {user.location}</Text>
 
       </View>
 
-      {/* 📍 INFO CARD */}
-      <View style={styles.card}>
+      {/* 📦 INFO CARDS */}
+      <View style={styles.container}>
 
-        <View style={styles.row}>
-          <Ionicons name="person-outline" size={20} color="#2e7d32" />
-          <Text style={styles.text}>
-            Name: {user?.name || "Not found"}
-          </Text>
+        <View style={styles.card}>
+          <Ionicons name="mail" size={22} color="#2e7d32" />
+          <View style={styles.cardTextBox}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>{user.email}</Text>
+          </View>
         </View>
 
-        <View style={styles.row}>
-          <Ionicons name="location-outline" size={20} color="#2e7d32" />
-          <Text style={styles.text}>
-            Location: {user?.location || "Not set"}
-          </Text>
+        <View style={styles.card}>
+          <Ionicons name="call" size={22} color="#2e7d32" />
+          <View style={styles.cardTextBox}>
+            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.value}>{user.phone}</Text>
+          </View>
         </View>
 
-        <View style={styles.row}>
-          <Ionicons name="home-outline" size={20} color="#2e7d32" />
-          <Text style={styles.text}>
-            District: {user?.district || "Not set"}
-          </Text>
+        <View style={styles.card}>
+          <Ionicons name="location" size={22} color="#2e7d32" />
+          <View style={styles.cardTextBox}>
+            <Text style={styles.label}>Location</Text>
+            <Text style={styles.value}>{user.location}</Text>
+          </View>
         </View>
 
-        <View style={styles.row}>
-          <Ionicons name="time-outline" size={20} color="#2e7d32" />
-          <Text style={styles.text}>
-            Last Active: {user?.last_login || "Never"}
-          </Text>
-        </View>
+      </View>
+
+      {/* 🔘 BUTTONS */}
+      <View style={styles.btnContainer}>
+
+        <TouchableOpacity style={styles.btn}>
+          <Ionicons name="create-outline" size={18} color="#fff" />
+          <Text style={styles.btnText}> Edit Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutBtn}>
+          <Ionicons name="log-out-outline" size={18} color="#fff" />
+          <Text style={styles.btnText}> Logout</Text>
+        </TouchableOpacity>
 
       </View>
 
@@ -90,71 +84,97 @@ export default function Profile() {
   );
 }
 
+/* ================= STYLES ================= */
 const styles = StyleSheet.create({
 
-  container: {
+  root: {
     flex: 1,
-    backgroundColor: "#eef7ee",
+    backgroundColor: "#f4fbf4",
   },
 
   header: {
-    backgroundColor: "#2e7d32",
-    height: 120,
-    justifyContent: "center",
+    backgroundColor: "#1b5e20",
     alignItems: "center",
-    borderBottomLeftRadius: 60,
-    borderBottomRightRadius: 60,
+    paddingTop: 60,
+    paddingBottom: 30,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
 
-  title: {
+  profileCircle: {
+    backgroundColor: "#fff",
+    padding: 18,
+    borderRadius: 100,
+    marginBottom: 10,
+  },
+
+  name: {
     color: "#fff",
     fontSize: 20,
     fontWeight: "bold",
   },
 
-  avatarBox: {
-    alignItems: "center",
-    marginTop: -40,
-  },
-
-  avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    borderWidth: 3,
-    borderColor: "#fff",
-  },
-
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 8,
-    color: "#2e7d32",
-  },
-
-  username: {
-    color: "#666",
+  location: {
+    color: "#c8e6c9",
     fontSize: 13,
+    marginTop: 4,
+  },
+
+  container: {
+    marginTop: 20,
+    paddingHorizontal: 15,
   },
 
   card: {
-    backgroundColor: "#fff",
-    margin: 20,
-    padding: 15,
-    borderRadius: 15,
-    elevation: 5,
-  },
-
-  row: {
     flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 14,
     marginBottom: 12,
+    alignItems: "center",
+    elevation: 3,
   },
 
-  text: {
+  cardTextBox: {
     marginLeft: 10,
-    fontSize: 13,
-    color: "#333",
+  },
+
+  label: {
+    fontSize: 12,
+    color: "#666",
+  },
+
+  value: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1b5e20",
+  },
+
+  btnContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+
+  btn: {
+    backgroundColor: "#2e7d32",
+    padding: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+
+  logoutBtn: {
+    backgroundColor: "#c62828",
+    padding: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+
+  btnText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 
 });
