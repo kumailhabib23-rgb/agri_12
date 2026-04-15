@@ -1,29 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter, usePathname } from "expo-router";
 
 export default function Footer() {
   const [activeTab, setActiveTab] = useState("home");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNav = (tab: string, route: string) => {
+    setActiveTab(tab);
+    router.push(route as any);
+  };
+
+  useEffect(() => {
+    if (!pathname) return;
+
+    if (pathname.startsWith("/user-portal")) {
+      setActiveTab("list");
+    } else if (pathname.startsWith("/status")) {
+      setActiveTab("stats");
+    } else if (pathname.startsWith("/profile")) {
+      setActiveTab("settings");
+    } else {
+      setActiveTab("home");
+    }
+  }, [pathname]);
 
   return (
     <View style={styles.footerNav}>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab("home")}>
+      <TouchableOpacity style={styles.navItem} onPress={() => handleNav("home", "./user-portal")}>
         <Ionicons name="home" size={22} color={activeTab === "home" ? "#2e7d32" : "#777"} />
         <Text style={[styles.navText, activeTab === "home" && styles.active]}>Home</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab("list")}>
+      <TouchableOpacity style={styles.navItem} onPress={() => handleNav("list", "./user-portal")}>
         <Ionicons name="list" size={22} color={activeTab === "list" ? "#2e7d32" : "#777"} />
         <Text style={[styles.navText, activeTab === "list" && styles.active]}>List</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab("stats")}>
-        <Ionicons name="stats-chart" size={22} color={activeTab === "stats" ? "#2e7d32" : "#777"} />
-        <Text style={[styles.navText, activeTab === "stats" && styles.active]}>Stats</Text>
+      <TouchableOpacity
+        style={styles.navItem}
+        onPress={() => handleNav("stats", "./status")}
+      >
+        <Ionicons
+          name="stats-chart"
+          size={22}
+          color={activeTab === "stats" ? "#2e7d32" : "#777"}
+        />
+        <Text style={[styles.navText, activeTab === "stats" && styles.active]}>Status</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab("settings")}>
+      <TouchableOpacity style={styles.navItem} onPress={() => handleNav("settings", "./profile")}>
         <Ionicons name="settings" size={22} color={activeTab === "settings" ? "#2e7d32" : "#777"} />
         <Text style={[styles.navText, activeTab === "settings" && styles.active]}>More</Text>
       </TouchableOpacity>

@@ -8,7 +8,6 @@ import {
   Animated,
   StatusBar,
   TouchableOpacity,
-  Image,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -19,13 +18,21 @@ export default function Portal() {
 
   const router = useRouter();
 
+  // 👤 USER
   const user = {
     name: "Ali Khan",
     location: "Sindh, Pakistan",
   };
 
-  // 🟩 CATEGORY
-  const categories = [
+  const isOnline = true; // 🟢 ONLINE STATUS
+
+  type CategoryItem = {
+    name: string;
+    icon: React.ComponentProps<typeof Ionicons>["name"];
+  };
+
+  // 🟩 CATEGORIES
+  const categories: CategoryItem[] = [
     { name: "Vegetables", icon: "leaf" },
     { name: "Fruits", icon: "nutrition" },
     { name: "Meat", icon: "restaurant" },
@@ -35,28 +42,32 @@ export default function Portal() {
   ];
 
   const [search, setSearch] = useState("");
-  const [timeLeft, setTimeLeft] = useState(0);
 
   // ⏳ TIMER
+  const [timeLeft, setTimeLeft] = useState(0);
+
   useEffect(() => {
-    const target = Date.now() + 24 * 60 * 60 * 1000;
+    const targetTime = Date.now() + 24 * 60 * 60 * 1000;
 
     const interval = setInterval(() => {
-      const diff = target - Date.now();
+      const diff = targetTime - Date.now();
       setTimeLeft(diff > 0 ? diff : 0);
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const formatTime = (ms) => {
+  // ✅ SAFE FORMAT
+  const formatTime = (ms = 0) => {
     const total = Math.floor(ms / 1000);
     const h = Math.floor(total / 3600);
     const m = Math.floor((total % 3600) / 60);
     const s = total % 60;
-    return h + "h " + m + "m " + s + "s";
+
+    return `${h}h ${m}m ${s}s`;
   };
 
+  // 🔍 SEARCH FILTER
   const filtered = categories.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -67,14 +78,14 @@ export default function Portal() {
   useEffect(() => {
     Animated.timing(headerAnim, {
       toValue: 1,
-      duration: 900,
+      duration: 800,
       useNativeDriver: true,
     }).start();
   }, []);
 
-  const headerTranslate = headerAnim.interpolate({
+  const translateY = headerAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [-120, 0],
+    outputRange: [-100, 0],
   });
 
   return (
@@ -86,10 +97,7 @@ export default function Portal() {
       <Animated.View
         style={[
           styles.header,
-          {
-            transform: [{ translateY: headerTranslate }],
-            opacity: headerAnim,
-          },
+          { transform: [{ translateY }], opacity: headerAnim },
         ]}
       >
         <View style={styles.headerRow}>
@@ -99,12 +107,14 @@ export default function Portal() {
             <Text style={styles.location}>📍 {user.location}</Text>
           </View>
 
-          {/* 👤 PROFILE ICON */}
+          {/* 👤 PROFILE + ONLINE DOT */}
           <TouchableOpacity
-            style={styles.iconBox}
+            style={styles.profileBox}
             onPress={() => router.push("./profile")}
           >
             <Ionicons name="person" size={24} color="#1b5e20" />
+
+            {isOnline && <View style={styles.onlineDot} />}
           </TouchableOpacity>
 
         </View>
@@ -112,10 +122,9 @@ export default function Portal() {
         <Text style={styles.headerSub}>
           Agriculture Portal • Smart Farming 🌾
         </Text>
-
       </Animated.View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView>
 
         {/* 🔍 SEARCH */}
         <View style={styles.searchBox}>
@@ -127,9 +136,6 @@ export default function Portal() {
             style={styles.input}
           />
         </View>
-
-        {/* 🌾 SLIDER */}
-        <AgriSlider />
 
         {/* 📊 CARDS */}
         <View style={styles.cardRow}>
@@ -159,10 +165,19 @@ export default function Portal() {
 
         <View style={styles.grid}>
           {filtered.map((item, i) => (
-            <View key={i} style={styles.gridCard}>
+            <TouchableOpacity
+              key={i}
+              style={styles.gridCard}
+              onPress={() =>
+                router.push({
+                  pathname: "./category",
+                  params: { name: item.name },
+                })
+              }
+            >
               <Ionicons name={item.icon} size={26} color="#2e7d32" />
               <Text style={styles.gridText}>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -173,64 +188,6 @@ export default function Portal() {
     </View>
   );
 }
-
-/* 🌾 SLIDER COMPONENT */
-const AgriSlider = () => {
-
-  const images = [
-    require("../assets/images/1.jpg"),
-    require("../assets/images/2.jpg"),
-    require("../assets/images/3.jpg"),
-  ];
-
-  const titles = [
-    "Green Agriculture 🌿",
-    "Smart Farming 🚜",
-    "Modern Techniques 🌱",
-  ];
-
-  const [index, setIndex] = useState(0);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-
-        setIndex((prev) => (prev + 1) % images.length);
-
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }).start();
-
-      });
-
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <View style={styles.slider}>
-
-      <Animated.Image
-        source={images[index]}
-        style={[styles.sliderImage, { opacity: fadeAnim }]}
-      />
-
-      <View style={styles.sliderOverlay}>
-        <Text style={styles.sliderTitle}>{titles[index]}</Text>
-      </View>
-
-    </View>
-  );
-};
 
 /* 🎨 STYLES */
 const styles = StyleSheet.create({
@@ -252,16 +209,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  iconBox: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 50,
-  },
-
   name: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   location: { color: "#c8e6c9", fontSize: 12 },
 
   headerSub: { marginTop: 8, color: "#e8f5e9", fontSize: 12 },
+
+  profileBox: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 50,
+    position: "relative",
+  },
+
+  onlineDot: {
+    position: "absolute",
+    top: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#00e676",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
 
   searchBox: {
     flexDirection: "row",
@@ -273,32 +243,6 @@ const styles = StyleSheet.create({
   },
 
   input: { marginLeft: 10, flex: 1 },
-
-  slider: {
-    marginHorizontal: 15,
-    height: 200,
-    borderRadius: 18,
-    overflow: "hidden",
-  },
-
-  sliderImage: {
-    width: "100%",
-    height: 200,
-    position: "absolute",
-  },
-
-  sliderOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    padding: 15,
-    backgroundColor: "rgba(0,0,0,0.3)",
-  },
-
-  sliderTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
 
   cardRow: {
     flexDirection: "row",
