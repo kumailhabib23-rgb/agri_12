@@ -105,28 +105,27 @@ export default function App() {
 
           {vegetables.map((item, i) => (
             <View key={i} style={styles.priceRow}>
-              <Text style={styles.name}>{item.name}</Text>
+              <View style={styles.nameTag}>
+                <View
+                  style={[
+                    styles.dot,
+                    item.change >= 0 ? styles.upDot : styles.downDot,
+                  ]}
+                />
+                <Text style={styles.name}>{item.name}</Text>
+              </View>
 
               <View style={styles.priceRight}>
                 <Text style={styles.price}>{item.price}</Text>
-
-                <View style={styles.changeTag}>
-                  <View
-                    style={[
-                      styles.dot,
-                      item.change >= 0 ? styles.upDot : styles.downDot,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.percent,
-                      item.change >= 0 ? styles.upText : styles.downText,
-                    ]}
-                  >
-                    {item.change >= 0 ? "+" : ""}
-                    {item.change}%
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.percent,
+                    item.change >= 0 ? styles.upText : styles.downText,
+                  ]}
+                >
+                  {item.change >= 0 ? "+" : ""}
+                  {item.change}%
+                </Text>
               </View>
             </View>
           ))}
@@ -138,28 +137,27 @@ export default function App() {
 
           {fruits.map((item, i) => (
             <View key={i} style={styles.priceRow}>
-              <Text style={styles.name}>{item.name}</Text>
+              <View style={styles.nameTag}>
+                <View
+                  style={[
+                    styles.dot,
+                    item.change >= 0 ? styles.upDot : styles.downDot,
+                  ]}
+                />
+                <Text style={styles.name}>{item.name}</Text>
+              </View>
 
               <View style={styles.priceRight}>
                 <Text style={styles.price}>{item.price}</Text>
-
-                <View style={styles.changeTag}>
-                  <View
-                    style={[
-                      styles.dot,
-                      item.change >= 0 ? styles.upDot : styles.downDot,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.percent,
-                      item.change >= 0 ? styles.upText : styles.downText,
-                    ]}
-                  >
-                    {item.change >= 0 ? "+" : ""}
-                    {item.change}%
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.percent,
+                    item.change >= 0 ? styles.upText : styles.downText,
+                  ]}
+                >
+                  {item.change >= 0 ? "+" : ""}
+                  {item.change}%
+                </Text>
               </View>
             </View>
           ))}
@@ -438,6 +436,12 @@ const styles = StyleSheet.create({
 
   downText: {
     color: "#dc2626",
+  },
+
+  nameTag: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
 
   row: {
