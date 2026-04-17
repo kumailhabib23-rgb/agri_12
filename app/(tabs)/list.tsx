@@ -4,11 +4,25 @@ import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 export default function LoginHistory() {
   const [search, setSearch] = useState("");
 
-  const data = [
+  type LoginStatus = "Online" | "Logout" | "Disconnected";
+
+  type HistoryItem = {
+    id: string;
+    user: string;
+    ip: string;
+    city: string;
+    device: string;
+    login: string;
+    logout: string;
+    duration: string;
+    status: LoginStatus;
+  };
+
+  const data: HistoryItem[] = [
     {
       id: "1",
       user: "Ahmed Khan",
-      ip: "192.168.1.110",
+      ip: "192.168.1.110", 
       city: "Karachi",
       device: "Android",
       login: "08:30 AM",
@@ -54,7 +68,7 @@ export default function LoginHistory() {
     });
   }, [search]);
 
-  const getStatusStyle = (status) => {
+  const getStatusStyle = (status: LoginStatus) => {
     switch (status) {
       case "Online":
         return styles.online;
@@ -65,7 +79,7 @@ export default function LoginHistory() {
     }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: HistoryItem }) => (
     <View style={styles.card}>
       <Text style={styles.user}>{item.user}</Text>
 
