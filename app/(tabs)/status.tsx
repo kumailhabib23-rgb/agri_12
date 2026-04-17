@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   ScrollView,
-  Animated,
   StatusBar,
   TouchableOpacity,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import Footer from "./components/footer";
 
 export default function Portal() {
 
@@ -32,61 +30,38 @@ export default function Portal() {
   };
 
   // 🟩 CATEGORIES
-  const categories: CategoryItem[] = [
+  const categoryList: CategoryItem[] = [
     { name: "Vegetables", icon: "leaf" },
     { name: "Fruits", icon: "nutrition" },
-    { name: "Meat", icon: "restaurant" },
     { name: "Grains", icon: "leaf-outline" },
-    { name: "Dairy", icon: "water" },
-    { name: "Poultry", icon: "egg" },
   ];
 
   const [search, setSearch] = useState("");
-
-  // ⏳ TIMER
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [offlinePending, setOfflinePending] = useState(3);
+  const [totalDataCount, setTotalDataCount] = useState(128);
+  const [syncedDataCount, setSyncedDataCount] = useState(92);
+  const remainingDataCount = totalDataCount - syncedDataCount;
 
   useEffect(() => {
-    const targetTime = Date.now() + 24 * 60 * 60 * 1000;
-
-    const interval = setInterval(() => {
-      const diff = targetTime - Date.now();
-      setTimeLeft(diff > 0 ? diff : 0);
-    }, 1000);
-
-    return () => clearInterval(interval);
+    let active = true;
+    const loadCategories = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      if (!active) return;
+      setCategories(categoryList);
+      setLoadingCategories(false);
+    };
+    loadCategories();
+    return () => {
+      active = false;
+    };
   }, []);
-
-  // ✅ SAFE FORMAT
-  const formatTime = (ms = 0) => {
-    const total = Math.floor(ms / 1000);
-    const h = Math.floor(total / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
-
-    return `${h}h ${m}m ${s}s`;
-  };
 
   // 🔍 SEARCH FILTER
   const filtered = categories.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  // 🎬 HEADER ANIMATION
-  const headerAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(headerAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  const translateY = headerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-100, 0],
-  });
 
   return (
     <View style={styles.root}>
@@ -94,16 +69,11 @@ export default function Portal() {
       <StatusBar barStyle="light-content" backgroundColor="#1b5e20" />
 
       {/* 🌿 HEADER */}
-      <Animated.View
-        style={[
-          styles.header,
-          { transform: [{ translateY }], opacity: headerAnim },
-        ]}
-      >
+      <View style={styles.header}>
         <View style={styles.headerRow}>
 
           <View>
-            <Text style={styles.name}>Hello, {user.name} 👋</Text>
+            <Text style={styles.name}>Hello, {user.name} </Text>
             <Text style={styles.location}>📍 {user.location}</Text>
           </View>
 
@@ -120,9 +90,9 @@ export default function Portal() {
         </View>
 
         <Text style={styles.headerSub}>
-          Agriculture Portal • Smart Farming 🌾
+          Agriculture Portal • Smart Farming 
         </Text>
-      </Animated.View>
+      </View>
 
       <ScrollView>
 
@@ -152,10 +122,16 @@ export default function Portal() {
             <Text style={styles.cardText}>Status</Text>
           </View>
 
+          {/* <View style={styles.card}>
+            <Ionicons name="cloud-offline-outline" size={22} color="#2e7d32" />
+            <Text style={styles.cardNum}>{offlinePending}</Text>
+            <Text style={styles.cardText}>Offline Pending</Text>
+          </View> */}
+
           <View style={styles.card}>
-            <Ionicons name="timer" size={22} color="#2e7d32" />
-            <Text style={styles.cardNum}>{formatTime(timeLeft)}</Text>
-            <Text style={styles.cardText}>Timer</Text>
+            <Ionicons name="timer" size={22} color="#2e7d32"/>
+            <Text style={styles.cardNum}>Live</Text>
+            <Text style={styles.cardText}>Status</Text>
           </View>
 
         </View>
@@ -163,27 +139,49 @@ export default function Portal() {
         {/* 🟩 GRID */}
         <Text style={styles.section}>Categories</Text>
 
-        <View style={styles.grid}>
-          {filtered.map((item, i) => (
-            <TouchableOpacity
-              key={i}
-              style={styles.gridCard}
-              onPress={() =>
-                router.push({
-                  pathname: "./category",
-                  params: { name: item.name },
-                })
-              }
-            >
-              <Ionicons name={item.icon} size={26} color="#2e7d32" />
-              <Text style={styles.gridText}>{item.name}</Text>
-            </TouchableOpacity>
-          ))}
+        {loadingCategories ? (
+          <View style={styles.loadingBox}>
+            <Text style={styles.loadingText}>Loading categories...</Text>
+          </View>
+        ) : (
+          <View style={styles.grid}>
+            {filtered.map((item, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.gridCard}
+                onPress={() =>
+                  router.push({
+                    pathname: "./category",
+                    params: { name: item.name },
+                  })
+                }
+              >
+                <Ionicons name={item.icon} size={26} color="#2e7d32" />
+                <Text style={styles.gridText}>{item.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.fullDataCard}>
+          <View style={styles.fullDataHeader}>
+            <Ionicons name="layers" size={24} color="#2e7d32" />
+            <Text style={styles.fullDataTitle}>Sync Progress</Text>
+          </View>
+          <Text style={styles.fullDataValue}>{syncedDataCount}/{totalDataCount}</Text>
+          <Text style={styles.fullDataSubtitle}>Records synced out of total available data</Text>
+
+          <View style={styles.syncRow}>
+            <Text style={styles.syncLabel}>Done</Text>
+            <Text style={styles.syncValue}>{syncedDataCount}</Text>
+          </View>
+          <View style={styles.syncRow}>
+            <Text style={styles.syncLabel}>Remaining</Text>
+            <Text style={styles.syncValue}>{remainingDataCount}</Text>
+          </View>
         </View>
 
       </ScrollView>
-
-      <Footer />
 
     </View>
   );
@@ -219,6 +217,21 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
     position: "relative",
+  },
+  loadingBox: {
+    margin: 15,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  loadingText: {
+    color: "#2e7d32",
+    fontWeight: "bold",
   },
 
   onlineDot: {
@@ -285,5 +298,60 @@ const styles = StyleSheet.create({
   },
 
   gridText: { marginTop: 6 },
+
+  fullDataCard: {
+    backgroundColor: "#fff",
+    margin: 15,
+    padding: 20,
+    borderRadius: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+
+  fullDataHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 12,
+  },
+
+  fullDataTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2e7d32",
+  },
+
+  fullDataValue: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#1b5e20",
+    marginBottom: 6,
+  },
+
+  fullDataSubtitle: {
+    color: "#4b5563",
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 14,
+  },
+
+  syncRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+  },
+
+  syncLabel: {
+    color: "#4b5563",
+  },
+
+  syncValue: {
+    fontWeight: "bold",
+    color: "#111",
+  },
 
 });

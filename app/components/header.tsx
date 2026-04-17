@@ -1,11 +1,15 @@
+import React from "react";
 import { View, Text, Image, StatusBar, StyleSheet } from "react-native";
+import { useTheme } from "../theme";
 
 export default function Header() {
+  const theme = useTheme();
+
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { backgroundColor: theme.primaryDark }] }>
       
       {/* STATUS BAR FIX */}
-      <StatusBar barStyle="light-content" backgroundColor="#1b5e20" />
+      <StatusBar barStyle="light-content" backgroundColor={theme.primaryDark} />
 
       {/* HEADER CONTAINER */}
       <View style={styles.container}>
@@ -18,8 +22,8 @@ export default function Header() {
 
         {/* TEXT AREA */}
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>SWAT</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: theme.textOnPrimary } ]}>SWAT</Text>
+          <Text style={[styles.subtitle, { color: theme.primaryLight } ]}>
             Sindh Water & Agriculture Transformation Department
           </Text>
         </View>
@@ -31,7 +35,6 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    backgroundColor: "#1b5e20",
     paddingTop: 30, // for status bar
   },
 

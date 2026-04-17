@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated, ImageBackground, Image } from "react-native";
+import { View, Text, StyleSheet, Animated, Image, ImageBackground } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function Splash() {
@@ -9,6 +9,7 @@ export default function Splash() {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
+    // 🔥 ANIMATION START
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -22,20 +23,21 @@ export default function Splash() {
       }),
     ]).start();
 
-    const timer = setTimeout(() => {
-      router.replace("./login");
+    // ⏳ REDIRECT AFTER 3 SEC
+    const redirectTimer = setTimeout(() => {
+      router.replace("/login");
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(redirectTimer);
+  }, [router]);
 
   return (
     <ImageBackground
       source={require("../assets/images/background.jpg")}
-      style={styles.background}
+      style={styles.container}
       resizeMode="cover"
     >
-      <View style={styles.overlay} />
+      <View style={styles.backdrop} />
 
       <Animated.View
         style={[
@@ -47,7 +49,9 @@ export default function Splash() {
           source={require("../assets/images/swat-logo.png")}
           style={styles.logo}
         />
+
         <Text style={styles.title}>SWAT</Text>
+
         <Text style={styles.fullForm}>
           Sindh Water & Agriculture Transformation
         </Text>
@@ -57,32 +61,31 @@ export default function Splash() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
+
   container: {
+    flex: 1,
+    backgroundColor: "#2e7d32",
     justifyContent: "center",
     alignItems: "center",
   },
+
   logoContainer: {
     alignItems: "center",
   },
+
   logo: {
     width: 100,
     height: 100,
     marginBottom: 15,
   },
+
   title: {
     fontSize: 32,
     color: "#fff",
     fontWeight: "bold",
     letterSpacing: 2,
   },
+
   fullForm: {
     marginTop: 8,
     color: "#c8e6c9",
@@ -90,8 +93,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 20,
   },
-  overlay: {
+
+  backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.35)",
+    backgroundColor: "rgba(0,0,0,0.25)",
   },
+
 });

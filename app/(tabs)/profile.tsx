@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
 
   btn: {
     backgroundColor: "#2e7d32",
-    padding: 14,
+    padding: 14,    
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "center",

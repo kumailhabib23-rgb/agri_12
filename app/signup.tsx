@@ -8,9 +8,9 @@ import {
   StyleSheet,
 } from "react-native";
 
-import * as Location from "expo-location";
+// import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import { insertUser, initDB } from "./utils/db";
+
 
 export default function Signup() {
   const router = useRouter();
