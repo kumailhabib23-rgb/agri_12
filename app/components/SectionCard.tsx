@@ -26,6 +26,13 @@ const createStyles = (theme: Theme) =>
       padding: 16,
       borderRadius: 16,
       marginBottom: 12,
+      elevation: 3,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.08,
+      shadowRadius: 3,
+      borderWidth: 1,
+      borderColor: theme.surfaceSoft,
     },
     title: {
       fontSize: 16,

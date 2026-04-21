@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
   footerNav: {
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 6,
     borderTopWidth: 0,
     shadowColor: "#000",

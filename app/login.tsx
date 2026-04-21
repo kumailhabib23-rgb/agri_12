@@ -6,149 +6,191 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function Login() {
   const router = useRouter();
 
-  const [cnic, setCnic] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Empty fields check
-    if (!cnic || !password) {
-      Alert.alert("Error", "Please fill all fields");
-      return;
-    }
+  // ⚠️ PUT YOUR REAL IP HERE
+  const API_URL = "http://172.16.14.18/agri_api/login.php";
 
-    // CNIC length check
-    if (cnic.length < 13) {
-      Alert.alert("Error", "CNIC must be 13 digits");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Fill all fields");
       return;
     }
 
     setLoading(true);
 
-    // Dummy login condition
-    setTimeout(() => {
-      if (cnic === "4210112345678" && password === "12345") {
-        Alert.alert("Success", "Login Successful");
-        router.push("/user-portal");
-      } else {
-        Alert.alert("Error", "Invalid CNIC or Password");
-      }
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
+
+      const data = JSON.parse(text);
 
       setLoading(false);
-    }, 500);
+
+      if (data.status) {
+        Alert.alert("Success", "Login successful");
+        router.replace("./user-portal");
+      } else {
+        Alert.alert("Error", data.message);
+      }
+
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      Alert.alert("Error", "Server not responding or IP wrong");
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Login to continue</Text>
 
+      {/* 🌿 LOGO SECTION */}
+      <View style={styles.logoBox}>
+        <View style={styles}>
+          {/* You can replace this with your image */}
+           <Image
+                    source={require("../assets/images/swat-logo.png")}
+                    style={styles.logo}
+                  />
+          
+        </View>
+        <Text style={styles.appName}>Agri Market System</Text>
+        <Text style={styles.subText}>Login to continue</Text>
+      </View>
+
+      {/* INPUTS */}
       <TextInput
-        placeholder="CNIC"
-        value={cnic}
-        onChangeText={setCnic}
-        keyboardType="numeric"
-        maxLength={13}
+        placeholder="Email"
         style={styles.input}
-        placeholderTextColor="#888"
+        value={email}
+        onChangeText={setEmail}
       />
 
       <TextInput
         placeholder="Password"
+        style={styles.input}
+        secureTextEntry
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-        placeholderTextColor="#888"
       />
 
-      <TouchableOpacity
-        style={[styles.button, loading && styles.disabledButton]}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Loading..." : "Login"}
-        </Text>
+      {/* BUTTON */}
+      <TouchableOpacity style={styles.btn} onPress={handleLogin}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.btnText}>Login</Text>
+        )}
       </TouchableOpacity>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Don&apos;t have an account?
-        </Text>
+      {/* SIGNUP */}
+      <TouchableOpacity onPress={() => router.push("/signup")}>
+        <Text style={styles.link}>Create new account</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/signup")}>
-          <Text style={styles.link}> Sign Up</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
 
+/* 🎨 STYLES */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F1F8F4",
     justifyContent: "center",
-    padding: 24,
+    padding: 20,
+    backgroundColor: "#f4fbf4",
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1B5E20",
-  },
-
-  subtitle: {
-    fontSize: 14,
-    color: "#4CAF50",
+  /* 🌿 LOGO DESIGN */
+  logoBox: {
+    alignItems: "center",
     marginBottom: 30,
   },
 
-  input: {
-    backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#C8E6C9",
+  // logoCircle: {
+  //   width: 90,
+  //   height: 90,
+  //   borderRadius: 50,
+  //   backgroundColor: "#2e7d32",
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   marginBottom: 10,
+  //   elevation: 5,
+  // },
+
+  logoText: {
+    fontSize: 40,
   },
 
-  button: {
-    backgroundColor: "#2E7D32",
+  appName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#1b5e20",
+  },
+
+  
+  logoContainer: {
+    alignItems: "center",
+  },
+
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 15,
+  },
+  subText: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 3,
+  },
+
+  /* INPUT */
+  input: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+  },
+
+  /* BUTTON */
+  btn: {
+    backgroundColor: "#2e7d32",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
   },
 
-  disabledButton: {
-    opacity: 0.7,
-  },
-
-  buttonText: {
+  btnText: {
     color: "#fff",
     fontWeight: "bold",
   },
 
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-
-  footerText: {
-    color: "#4CAF50",
-  },
-
   link: {
-    color: "#1B5E20",
-    fontWeight: "bold",
+    marginTop: 15,
+    textAlign: "center",
+    color: "#2e7d32",
   },
 });

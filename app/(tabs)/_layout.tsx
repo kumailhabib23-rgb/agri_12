@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Footer from "../components/footer";
 
 function TabItem({
   focused,
@@ -28,52 +29,53 @@ function TabItem({
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-
-        // ✅ SAFE: no tabBarButton (prevents errors)
-        tabBarStyle: styles.tabBar,
-      }}
-    >
-      <Tabs.Screen
-        name="user-portal"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabItem focused={focused} icon="home" label="Home" />
-          ),
+    <View style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: false,
+          tabBarStyle: { display: 'none' },
         }}
-      />
+      >
+        <Tabs.Screen
+          name="user-portal"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <TabItem focused={focused} icon="home" label="Home" />
+            ),
+          }}
+        />
 
-      <Tabs.Screen
-        name="list"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabItem focused={focused} icon="list" label="List" />
-          ),
-        }}
-      />
+        <Tabs.Screen
+          name="list"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <TabItem focused={focused} icon="list" label="List" />
+            ),
+          }}
+        />
 
-      <Tabs.Screen
-        name="status"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabItem focused={focused} icon="stats-chart" label="Status" />
-          ),
-        }}
-      />
+        <Tabs.Screen
+          name="status"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <TabItem focused={focused} icon="stats-chart" label="Status" />
+            ),
+          }}
+        />
 
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabItem focused={focused} icon="settings" label="More" />
-          ),
-        }}
-      />
-    </Tabs>
-  );
+        <Tabs.Screen
+          name="profile"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <TabItem focused={focused} icon="settings" label="More" />
+            ),
+          }}
+        />
+      </Tabs>
+      <Footer />
+    </View>
+    );
 }
 
 const styles = StyleSheet.create({

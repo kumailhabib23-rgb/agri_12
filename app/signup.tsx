@@ -1,92 +1,113 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
-
-// import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-
 
 export default function Signup() {
   const router = useRouter();
 
-  // const [name, setName] = useState("");
-  // const [cnic, setCnic] = useState("");
-  // const [phone, setPhone] = useState("");
-  // const [district, setDistrict] = useState("");
-  // const [username, setUsername] = useState("");
-  // const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    password: "",
+    location: "",
+  });
 
-  // const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   initDB();
-  //   getLocation();
-  // }, []);
+  // 🔥 CHANGE THIS IP
+  const API_URL = "http://172.16.14.18/agri_api/signup.php";
 
-  // 📍 AUTO LOCATION
-  // const getLocation = async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  const handleSignup = async () => {
+    try {
+      setLoading(true);
 
-  //   if (status !== "granted") {
-  //     Alert.alert("Permission denied");
-  //     return;
-  //   }
+      console.log("Sending:", form);
 
-  //   let loc = await Location.getCurrentPositionAsync({});
-  //   setLocation(`${loc.coords.latitude}, ${loc.coords.longitude}`);
-  // };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-  // // 🧑 CARTOON AVATAR
-  // const avatar = `https://api.dicebear.com/7.x/adventurer/png?seed=${username || "user"}`;
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
 
-  // ✅ REGISTER USER
-  // const register = async () => {
-  //   if (!name || !cnic || !phone || !district || !username || !password) {
-  //     Alert.alert("Error", "Fill all fields");
-  //     return;
-  //   }
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Invalid server response");
+      }
 
-  //   await insertUser(
-  //     name,
-  //     cnic,
-  //     phone,
-  //     district,
-  //     username,
-  //     password,
-  //     location,
-  //     avatar
-  //   );
+      setLoading(false);
 
-    Alert.alert("Success", "User Registered");
+      if (data.status) {
+        Alert.alert("Success", data.message);
+        router.replace("/login");
+      } else {
+        Alert.alert("Error", data.message);
+      }
 
-  //   router.replace({
-  //     pathname: "./user-portal",
-  //     params: { username },
-  //   });
-  // };
+    } catch (error) {
+      setLoading(false);
+      console.log("ERROR:", error);
+      Alert.alert("Server Error", "Check IP / XAMPP / WiFi");
+    }
+  };
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>Signup</Text>
 
-      <TextInput placeholder="Name" style={styles.input} />
-      <TextInput placeholder="CNIC" style={styles.input} />
-      <TextInput placeholder="Phone" style={styles.input}  />
-      <TextInput placeholder="District" style={styles.input} />
-      <TextInput placeholder="Username" style={styles.input} />
-      <TextInput placeholder="Password" secureTextEntry style={styles.input} />
+      <TextInput
+        placeholder="Full Name"
+        style={styles.input}
+        onChangeText={(v) => setForm({ ...form, full_name: v })}
+      />
 
-      <Text style={styles.loc}>📍</Text>
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        onChangeText={(v) => setForm({ ...form, email: v })}
+      />
 
-      <TouchableOpacity style={styles.btn} onPress={() => router.push('./user-portal')}>
-        <Text style={styles.btnText}>Create Account</Text>
+      <TextInput
+        placeholder="Phone"
+        style={styles.input}
+        onChangeText={(v) => setForm({ ...form, phone: v })}
+      />
+
+      <TextInput
+        placeholder="Password"
+        style={styles.input}
+        secureTextEntry
+        onChangeText={(v) => setForm({ ...form, password: v })}
+      />
+
+      <TextInput
+        placeholder="Location"
+        style={styles.input}
+        onChangeText={(v) => setForm({ ...form, location: v })}
+      />
+
+      <TouchableOpacity style={styles.btn} onPress={handleSignup}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.btnText}>Create Account</Text>
+        )}
       </TouchableOpacity>
 
     </View>
@@ -94,45 +115,37 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     padding: 20,
     justifyContent: "center",
+    backgroundColor: "#f4fbf4",
   },
 
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: "#2e7d32",
+    color: "#1b5e20",
   },
 
   input: {
     backgroundColor: "#fff",
     padding: 12,
     marginBottom: 10,
-    borderRadius: 8,
+    borderRadius: 10,
   },
 
   btn: {
     backgroundColor: "#2e7d32",
     padding: 14,
     borderRadius: 10,
-    marginTop: 10,
+    alignItems: "center",
   },
 
   btnText: {
     color: "#fff",
-    textAlign: "center",
     fontWeight: "bold",
   },
-
-  loc: {
-    textAlign: "center",
-    marginVertical: 10,
-    color: "#555",
-  },
-
 });

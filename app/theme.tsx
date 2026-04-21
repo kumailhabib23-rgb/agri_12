@@ -2,10 +2,13 @@ import React, { createContext, useContext, ReactNode } from "react";
 
 export const theme = {
   primary: "#14532d",
-  primaryDark: "#14532d",
+  primaryDark: "#0f3d22",
   primaryLight: "#d1fae5",
+  secondary: "#f59e0b", // amber
+  accent: "#3b82f6", // blue
   success: "#16a34a",
   error: "#dc2626",
+  warning: "#f59e0b",
   background: "#F4F6F8",
   surface: "#ffffff",
   surfaceSoft: "#14532d",

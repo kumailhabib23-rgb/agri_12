@@ -51,11 +51,11 @@ export default function MarketForm() {
     "Badin": ["Badin Mandi"],
     "Thatta": ["Thatta Market"],
     "Sujawal": ["Sujawal Mandi"],
-    "Hyderabad (Additional)": ["Latifabad Vegetable Market"],
-    "Karachi (Additional)": ["Lea Market"],
-    "Sukkur (Additional)": ["Rohri Market"],
-    "Larkana (Additional)": ["Ratodero Mandi"],
-    "Mirpurkhas (Additional)": ["Digri Mandi"],
+    // "Hyderabad (Additional)": ["Latifabad Vegetable Market"],
+    // "Karachi (Additional)": ["Lea Market"],
+    // "Sukkur (Additional)": ["Rohri Market"],
+    // "Larkana (Additional)": ["Ratodero Mandi"],
+    // "Mirpurkhas (Additional)": ["Digri Mandi"],
   };
 
   const [date, setDate] = useState("");

@@ -21,7 +21,7 @@ export default function App() {
   const [chartData, setChartData] = useState([72, 74, 73, 78, 80, 77, 85]);
 
   /* ---------------- COUNTDOWN ------------------ */
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   /* ---------------- HEADER ANIMATION ---------------- */
   const headerAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +57,7 @@ export default function App() {
   /* ---------------- COUNTDOWN ---------------- */
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => (prev > 0 ? prev - 1 : 300));
+      setTimeLeft(prev => (prev < 300 ? prev + 1 : 0));
     }, 1000);
 
     return () => clearInterval(timer);
@@ -95,7 +95,8 @@ export default function App() {
               value={item.value}
               sub={item.sub}
               timeLeft={formatTime(timeLeft)}
-            />
+              icon={item.icon}
+  />
           ))}
         </View>
 
@@ -124,7 +125,7 @@ export default function App() {
             width={screenWidth - 40}
             height={220}
             bezier
-            withDots
+            withDots={false}
             withShadow
             withInnerLines={false}
             withOuterLines={false}
@@ -168,13 +169,12 @@ export default function App() {
     </View>
   );
 }
-
 /* ---------------- DATA ---------------- */
 
 const metrics = [
-  { label: "Markets", value: "24", sub: "+3 this week" },
+  { label: "Markets", value: "24", sub: "+3 this week", icon: "storefront" as const },
   // { label: "Entries", value: "186", sub: "87% synced" },
-  { label: "Commodities", value: "42", sub: "Veg + Fruit" },
+  { label: "Commodities", value: "42", sub: "Veg + Fruit", icon: "leaf" as const },
   // { label: "Avg Change", value: "+4.2%", sub: "vs yesterday" },
 ];
 
@@ -243,7 +243,6 @@ const createStyles = (theme: Theme) =>
       borderBottomRightRadius: 22,
       elevation: 5,
     },
-
     title: {
       fontSize: 20,
       fontWeight: "bold",
@@ -276,6 +275,7 @@ const createStyles = (theme: Theme) =>
 
     scroll: {
       padding: 12,
+      paddingBottom: 80,
     },
 
     metrics: {

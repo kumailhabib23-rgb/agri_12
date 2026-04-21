@@ -9,7 +9,7 @@ export default function Splash() {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
-    // 🔥 ANIMATION START
+    //  ANIMATION START
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
