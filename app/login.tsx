@@ -67,7 +67,7 @@ export default function Login() {
 
       {/* 🌿 LOGO SECTION */}
       <View style={styles.logoBox}>
-        <View style={styles}>
+        <View style={styles.logo}>
           {/* You can replace this with your image */}
            <Image
                     source={require("../assets/images/swat-logo.png")}
